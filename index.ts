@@ -2,11 +2,14 @@ import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import messageReceivedHandler from "./hooks/group-logger/handler.js";
+import messageReceivedHandler, { setLogger } from "./hooks/group-logger/handler.js";
 
 const LOG_FILE = join(homedir(), ".openclaw", "group-messages.jsonl");
 
 export default function register(api: OpenClawPluginApi) {
+  // Wire the plugin logger into the handler so all logs go through OpenClaw's logging system
+  setLogger(api.logger);
+
   api.on("message_received", messageReceivedHandler);
 
   api.logger.info("[openclaw-group-logger] Plugin loaded successfully");

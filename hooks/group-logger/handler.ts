@@ -4,12 +4,21 @@ import { join } from "node:path";
 
 const OPENCLAW_DIR = join(homedir(), ".openclaw");
 const LOG_FILE = join(OPENCLAW_DIR, "group-messages.jsonl");
-const DEBUG = process.env.OPENCLAW_GROUP_LOGGER_DEBUG === "1";
+const DEBUG = true;
+
+const TAG = "[openclaw-group-logger]";
 
 // Ensure directory exists
 if (!existsSync(OPENCLAW_DIR)) {
   mkdirSync(OPENCLAW_DIR, { recursive: true });
 }
+
+type PluginLogger = {
+  info: (message: string) => void;
+  warn: (message: string) => void;
+  error: (message: string) => void;
+  debug?: (message: string) => void;
+};
 
 type MessageReceivedEvent = {
   from: string;
@@ -23,6 +32,17 @@ type MessageContext = {
   accountId?: string;
   conversationId?: string;
 };
+
+let _logger: PluginLogger = {
+  info: (msg) => console.log(`${TAG} ${msg}`),
+  warn: (msg) => console.warn(`${TAG} ${msg}`),
+  error: (msg) => console.error(`${TAG} ${msg}`),
+  debug: (msg) => console.log(`${TAG}[debug] ${msg}`),
+};
+
+export function setLogger(logger: PluginLogger): void {
+  _logger = logger;
+}
 
 const asString = (value: unknown): string => (typeof value === "string" ? value : "");
 const isWhatsAppLikeChannel = (value: string): boolean => {
@@ -45,6 +65,8 @@ const toIsoTimestamp = (timestamp?: number): string => {
 
 const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promise<void> => {
   try {
+    _logger.info(`Hook fired — from=${event.from ?? "-"} channel=${ctx.channelId ?? "-"} contentLen=${asString(event.content).length}`);
+
     const metadata = event.metadata ?? {};
     const groupIdCandidates = [
       asString(ctx.conversationId),
@@ -61,6 +83,7 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
       asString(metadata.provider),
     ];
     const isWhatsApp = groupId !== "" || channelCandidates.some(isWhatsAppLikeChannel);
+
     if (DEBUG) {
       const rawType = (event as { type?: unknown }).type;
       const rawEventContext = (event as { context?: unknown }).context;
@@ -71,19 +94,22 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
       const ctxKeys = Object.keys(ctx ?? {});
       const metadataKeys = Object.keys(metadata);
 
-      console.log(
-        `[openclaw-group-logger][debug] event.type=${String(rawType ?? "-")} channel=${ctx.channelId} groupId=${groupId || "-"} contentLen=${asString(event.content).length}`
+      _logger.debug?.(
+        `event.type=${String(rawType ?? "-")} channel=${ctx.channelId} groupId=${groupId || "-"} contentLen=${asString(event.content).length}`
       );
-      console.log(
-        `[openclaw-group-logger][debug] ctxKeys=${ctxKeys.join(",") || "-"} event.context.keys=${eventContextKeys.join(",") || "-"} metadataKeys=${metadataKeys.join(",") || "-"}`
+      _logger.debug?.(
+        `ctxKeys=${ctxKeys.join(",") || "-"} event.context.keys=${eventContextKeys.join(",") || "-"} metadataKeys=${metadataKeys.join(",") || "-"}`
       );
     }
+
     if (!isWhatsApp || !groupId) {
+      _logger.info(`Skipped — not a WhatsApp group message (isWhatsApp=${isWhatsApp}, groupId=${groupId || "none"})`);
       return;
     }
 
     const message = asString(event.content).trim();
     if (!message) {
+      _logger.info("Skipped — empty message content");
       return;
     }
 
@@ -105,9 +131,9 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
 
     // Append to JSONL file (synchronous operation to avoid concurrency issues)
     appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", { encoding: "utf-8" });
+    _logger.info(`Logged message from ${entry.senderName} in group ${entry.groupId}`);
   } catch (error) {
-    // Fail silently to avoid interfering with OpenClaw operation
-    console.error("[openclaw-group-logger] Error logging message:", error);
+    _logger.error(`Error logging message: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
 
