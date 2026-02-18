@@ -1,7 +1,7 @@
 ---
 name: group-logger
 description: "Automatically log all WhatsApp group messages to persistent storage"
-meta
+meta:
   openclaw:
     emoji: "📝"
     events: ["message_received"]
