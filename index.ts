@@ -9,10 +9,10 @@ const LOG_FILE = join(homedir(), ".openclaw", "group-messages.jsonl");
 export default function register(api: OpenClawPluginApi) {
   api.on("message_received", messageReceivedHandler);
 
-  api.logger.info("[group-logger] Plugin loaded successfully");
-  api.logger.info("[group-logger] Hook registered: message_received");
-  api.logger.info("[group-logger] Skill registered: group-reader");
-  api.logger.info(`[group-logger] Log file: ${LOG_FILE}`);
+  api.logger.info("[openclaw-group-logger] Plugin loaded successfully");
+  api.logger.info("[openclaw-group-logger] Hook registered: message_received");
+  api.logger.info("[openclaw-group-logger] Skill registered: group-reader");
+  api.logger.info(`[openclaw-group-logger] Log file: ${LOG_FILE}`);
 
   // Register /grouplogs command - view storage status
   api.registerCommand({

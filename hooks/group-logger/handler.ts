@@ -82,7 +82,7 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
     appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", { encoding: "utf-8" });
   } catch (error) {
     // Fail silently to avoid interfering with OpenClaw operation
-    console.error("[group-logger] Error logging message:", error);
+    console.error("[openclaw-group-logger] Error logging message:", error);
   }
 };
 

@@ -1,5 +1,5 @@
 {
-  "id": "group-logger",
+  "id": "openclaw-group-logger",
   "name": "WhatsApp Group Message Logger",
   "description": "Store and retrieve WhatsApp group messages without triggering AI responses",
   "version": "1.0.0",

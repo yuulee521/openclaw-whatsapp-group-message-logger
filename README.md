@@ -144,11 +144,11 @@ rm ~/.openclaw/group-messages.jsonl
    ```bash
    openclaw hooks list | grep group-logger
    ```
-   Should show: `✓ plugin:group-logger/group-logger`
+   Should show: `✓ plugin:openclaw-group-logger/group-logger`
 
 2. Check plugin is loaded:
    ```bash
-   openclaw plugins list | grep group-logger
+   openclaw plugins list | grep openclaw-group-logger
    ```
 
 3. Verify group config allows messages (not `groupPolicy: "disabled"`)
