@@ -10,8 +10,5 @@
   },
   "author": "yuulee521",
   "homepage": "https://github.com/yuulee521/openclaw-whatsapp-group-message-logger",
-  "openclaw": {
-    "extensions": ["./index.ts"],
-    "skills": ["./skills"]
-  }
+  "skills": ["./skills"]
 }

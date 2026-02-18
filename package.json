@@ -33,15 +33,7 @@
   "openclaw": {
     "extensions": [
       "./index.ts"
-    ],
-    "skills": [
-      "./skills"
-    ],
-    "configSchema": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {}
-    }
+    ]
   },
   "devDependencies": {
     "@types/node": "^25.2.3",

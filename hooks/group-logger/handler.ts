@@ -66,6 +66,8 @@ const toIsoTimestamp = (timestamp?: number): string => {
 const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promise<void> => {
   try {
     _logger.info(`Hook fired — from=${event.from ?? "-"} channel=${ctx.channelId ?? "-"} contentLen=${asString(event.content).length}`);
+    console.log(`Hook fired — from=${event.from ?? "-"} channel=${ctx.channelId ?? "-"} contentLen=${asString(event.content).length}`);
+
 
     const metadata = event.metadata ?? {};
     const groupIdCandidates = [
@@ -134,6 +136,8 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
     _logger.info(`Logged message from ${entry.senderName} in group ${entry.groupId}`);
   } catch (error) {
     _logger.error(`Error logging message: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`[openclaw-group-logger] something went wrong: ${error instanceof Error ? error.message : String(error)}`);
+
   }
 };
 
