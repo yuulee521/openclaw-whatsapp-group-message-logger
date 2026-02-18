@@ -4,6 +4,7 @@ import { join } from "node:path";
 
 const OPENCLAW_DIR = join(homedir(), ".openclaw");
 const LOG_FILE = join(OPENCLAW_DIR, "group-messages.jsonl");
+const DEBUG = process.env.OPENCLAW_GROUP_LOGGER_DEBUG === "1";
 
 // Ensure directory exists
 if (!existsSync(OPENCLAW_DIR)) {
@@ -24,6 +25,10 @@ type MessageContext = {
 };
 
 const asString = (value: unknown): string => (typeof value === "string" ? value : "");
+const isWhatsAppLikeChannel = (value: string): boolean => {
+  const normalized = value.trim().toLowerCase();
+  return normalized.includes("whatsapp") || normalized === "web" || normalized === "web-inbound";
+};
 
 const extractGroupJid = (value: string): string => {
   const match = value.match(/([0-9A-Za-z._-]+@g\.us)/);
@@ -40,11 +45,6 @@ const toIsoTimestamp = (timestamp?: number): string => {
 
 const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promise<void> => {
   try {
-    // Only handle WhatsApp channel messages
-    if (ctx.channelId !== "whatsapp") {
-      return;
-    }
-
     const metadata = event.metadata ?? {};
     const groupIdCandidates = [
       asString(ctx.conversationId),
@@ -53,7 +53,32 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
       asString(event.from),
     ];
     const groupId = groupIdCandidates.map(extractGroupJid).find(Boolean) ?? "";
-    if (!groupId) {
+
+    const channelCandidates = [
+      asString(ctx.channelId),
+      asString(metadata.originatingChannel),
+      asString(metadata.surface),
+      asString(metadata.provider),
+    ];
+    const isWhatsApp = groupId !== "" || channelCandidates.some(isWhatsAppLikeChannel);
+    if (DEBUG) {
+      const rawType = (event as { type?: unknown }).type;
+      const rawEventContext = (event as { context?: unknown }).context;
+      const eventContextKeys =
+        rawEventContext && typeof rawEventContext === "object" && !Array.isArray(rawEventContext)
+          ? Object.keys(rawEventContext as Record<string, unknown>)
+          : [];
+      const ctxKeys = Object.keys(ctx ?? {});
+      const metadataKeys = Object.keys(metadata);
+
+      console.log(
+        `[openclaw-group-logger][debug] event.type=${String(rawType ?? "-")} channel=${ctx.channelId} groupId=${groupId || "-"} contentLen=${asString(event.content).length}`
+      );
+      console.log(
+        `[openclaw-group-logger][debug] ctxKeys=${ctxKeys.join(",") || "-"} event.context.keys=${eventContextKeys.join(",") || "-"} metadataKeys=${metadataKeys.join(",") || "-"}`
+      );
+    }
+    if (!isWhatsApp || !groupId) {
       return;
     }
 
