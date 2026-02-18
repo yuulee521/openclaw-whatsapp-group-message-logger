@@ -3,6 +3,11 @@
   "name": "WhatsApp Group Message Logger",
   "description": "Store and retrieve WhatsApp group messages without triggering AI responses",
   "version": "1.0.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  },
   "author": "yuulee521",
   "homepage": "https://github.com/yuulee521/openclaw-whatsapp-group-message-logger",
   "openclaw": {
