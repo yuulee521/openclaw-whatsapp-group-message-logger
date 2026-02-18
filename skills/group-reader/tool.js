@@ -6,7 +6,7 @@ import { homedir } from "os";
 
 const LOG_FILE = join(homedir(), ".openclaw", "group-messages.jsonl");
 
-// 解析命令行参数 (OpenClaw传递为 --key value 格式)
+// Parse command line arguments (OpenClaw passes as --key value format)
 function parseArgs(args) {
   const params = {};
   for (let i = 0; i < args.length; i += 2) {
@@ -23,7 +23,7 @@ try {
   const args = process.argv.slice(2);
   const params = parseArgs(args);
 
-  // 检查文件是否存在
+  // Check if file exists
   if (!existsSync(LOG_FILE)) {
     console.log(
       JSON.stringify({
@@ -36,7 +36,7 @@ try {
     process.exit(0);
   }
 
-  // 读取并解析JSONL
+  // Read and parse JSONL
   const content = readFileSync(LOG_FILE, "utf-8");
   let messages = content
     .split("\n")
@@ -50,12 +50,12 @@ try {
     })
     .filter((msg) => msg !== null);
 
-  // 过滤器1: group_id
+  // Filter 1: group_id
   if (params.group_id) {
     messages = messages.filter((m) => m.groupId === params.group_id);
   }
 
-  // 过滤器2: since (ISO timestamp)
+  // Filter 2: since (ISO timestamp)
   if (params.since) {
     const sinceTime = new Date(params.since).getTime();
     if (!isNaN(sinceTime)) {
@@ -66,7 +66,7 @@ try {
     }
   }
 
-  // 过滤器3: hours (最近N小时，优先级低于since)
+  // Filter 3: hours (last N hours, lower priority than since)
   if (params.hours && !params.since) {
     const hours = parseInt(params.hours);
     if (!isNaN(hours) && hours > 0) {
@@ -78,18 +78,18 @@ try {
     }
   }
 
-  // 排序: 时间升序 (最早的在前)
+  // Sort: time ascending (earliest first)
   messages.sort((a, b) => {
     return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
   });
 
-  // 限制数量 (取最新的N条)
+  // Limit quantity (take the latest N items)
   const limit = parseInt(params.limit) || 100;
   if (messages.length > limit) {
     messages = messages.slice(-limit);
   }
 
-  // 输出结果
+  // Output results
   const result = {
     messages: messages,
     count: messages.length,

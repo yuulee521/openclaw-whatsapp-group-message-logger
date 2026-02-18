@@ -14,7 +14,7 @@ export default function register(api: OpenClawPluginApi) {
   api.logger.info("[group-logger] Skill registered: group-reader");
   api.logger.info(`[group-logger] Log file: ${LOG_FILE}`);
 
-  // 注册 /grouplogs 命令 - 查看存储状态
+  // Register /grouplogs command - view storage status
   api.registerCommand({
     name: "grouplogs",
     description: "Show WhatsApp group message log statistics",
@@ -31,16 +31,16 @@ export default function register(api: OpenClawPluginApi) {
         const lines = content.split("\n").filter(Boolean);
         const messageCount = lines.length;
 
-        // 统计群组数量
+        // Count number of groups
         const groups = new Set();
         lines.forEach((line) => {
           try {
             const msg = JSON.parse(line);
             if (msg.groupId) groups.add(msg.groupId);
-          } catch {}
+          } catch { }
         });
 
-        // 最新消息时间
+        // Latest message time
         let latestTime = "N/A";
         if (lines.length > 0) {
           try {
@@ -48,7 +48,7 @@ export default function register(api: OpenClawPluginApi) {
             latestTime = new Date(lastMsg.timestamp).toLocaleString("nl-NL", {
               timeZone: "Europe/Amsterdam",
             });
-          } catch {}
+          } catch { }
         }
 
         return {

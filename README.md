@@ -67,9 +67,9 @@ Output:
 **Natural language examples:**
 
 ```
-"总结家庭群今天的讨论"
-"工作群最近一周说了什么？"
-"所有群组的最新消息"
+"Summarize today's discussion in the family group"
+"What has been said in the work group over the past week?"
+"Latest messages from all groups"
 ```
 
 ### Automated Summaries
@@ -82,7 +82,7 @@ openclaw cron add \
   --cron "0 22 * * *" \
   --tz "Europe/Amsterdam" \
   --session isolated \
-  --message "用group-reader工具读取群组120363xxx@g.us最近24小时的消息并总结要点，发送给我" \
+  --message "Use group-reader tool to read messages from group 120363xxx@g.us for the last 24 hours and summarize the key points, then send them to me" \
   --channel whatsapp \
   --to "+31627393856"
 ```
@@ -95,7 +95,7 @@ openclaw cron add \
   --cron "0 18 * * 5" \
   --tz "Europe/Amsterdam" \
   --session isolated \
-  --message "总结工作群(120363yyy@g.us)本周的重要讨论，包括决策、任务分配和待办事项" \
+  --message "Summarize important discussions in the work group (120363yyy@g.us) this week, including decisions, task assignments, and to-do items" \
   --channel whatsapp \
   --to "+31627393856"
 ```

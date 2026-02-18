@@ -5,7 +5,7 @@ import { join } from "node:path";
 const OPENCLAW_DIR = join(homedir(), ".openclaw");
 const LOG_FILE = join(OPENCLAW_DIR, "group-messages.jsonl");
 
-// 确保目录存在
+// Ensure directory exists
 if (!existsSync(OPENCLAW_DIR)) {
   mkdirSync(OPENCLAW_DIR, { recursive: true });
 }
@@ -40,7 +40,7 @@ const toIsoTimestamp = (timestamp?: number): string => {
 
 const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promise<void> => {
   try {
-    // 只处理 WhatsApp 渠道消息
+    // Only handle WhatsApp channel messages
     if (ctx.channelId !== "whatsapp") {
       return;
     }
@@ -62,7 +62,7 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
       return;
     }
 
-    // 构建日志条目
+    // Build log entry
     const entry = {
       timestamp: toIsoTimestamp(event.timestamp),
       groupId,
@@ -78,10 +78,10 @@ const handler = async (event: MessageReceivedEvent, ctx: MessageContext): Promis
       accountId: ctx.accountId ?? "default",
     };
 
-    // 追加到JSONL文件 (同步操作避免并发问题)
+    // Append to JSONL file (synchronous operation to avoid concurrency issues)
     appendFileSync(LOG_FILE, JSON.stringify(entry) + "\n", { encoding: "utf-8" });
   } catch (error) {
-    // 静默失败，避免干扰OpenClaw运行
+    // Fail silently to avoid interfering with OpenClaw operation
     console.error("[group-logger] Error logging message:", error);
   }
 };

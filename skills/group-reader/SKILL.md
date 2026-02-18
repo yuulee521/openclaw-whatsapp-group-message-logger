@@ -74,13 +74,13 @@ JSON object with:
 
 **Example Invocations:**
 
-User: "总结家庭群今天的讨论"
+User: "Summarize today's discussion in the family group"
 → Calls: `read_group_messages(group_id="120363xxx@g.us", hours=24)`
 
-User: "工作群最近一周说了什么？"
+User: "What has been said in the work group over the past week?"
 → Calls: `read_group_messages(group_id="120363yyy@g.us", hours=168)`
 
-User: "所有群组的最新消息"
+User: "Latest messages from all groups"
 → Calls: `read_group_messages(limit=50)`
 
 ## Implementation

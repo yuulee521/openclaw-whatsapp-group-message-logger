@@ -73,8 +73,8 @@ Works with `requireMention: true` in WhatsApp group config to prevent unwanted A
 Once enabled, all group messages are automatically logged. Use the `group-reader` skill to retrieve and analyze them:
 
 ```
-"总结家庭群今天的讨论"
-"读取工作群最近48小时的消息"
+"Summarize today's discussion in the family group"
+"Read messages from the work group in the last 48 hours"
 ```
 
 Or check status with:
